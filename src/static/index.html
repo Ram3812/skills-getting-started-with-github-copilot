@@ -46,5 +46,53 @@
     </footer>
 
     <script src="app.js"></script>
+    <script>
+      // Enhance activity card rendering to include participants
+      document.addEventListener("DOMContentLoaded", () => {
+        fetch("/activities")
+          .then((res) => res.json())
+          .then((data) => {
+            const activitiesList = document.getElementById("activities-list");
+            activitiesList.innerHTML = "";
+            Object.entries(data).forEach(([name, info]) => {
+              const card = document.createElement("div");
+              card.className = "activity-card";
+              card.innerHTML = `
+                <h4>${name}</h4>
+                <p>${info.description}</p>
+                <p><strong>Schedule:</strong> ${info.schedule}</p>
+                <p><strong>Max Participants:</strong> ${info.max_participants}</p>
+                <div class="participants-section">
+                  <strong>Participants:</strong>
+                  ${
+                    info.participants && info.participants.length > 0
+                      ? `<ul class="participants-list">${info.participants
+                          .map(
+                            (email) =>
+                              `<li><span class="participant-avatar">${email
+                                .charAt(0)
+                                .toUpperCase()}</span> ${email}</li>`
+                          )
+                          .join("")}</ul>`
+                      : `<span class="no-participants">No participants yet.</span>`
+                  }
+                </div>
+              `;
+              activitiesList.appendChild(card);
+            });
+
+            // Populate activity select dropdown
+            const select = document.getElementById("activity");
+            select.innerHTML =
+              '<option value="">-- Select an activity --</option>' +
+              Object.keys(data)
+                .map(
+                  (name) =>
+                    `<option value="${name.replace(/"/g, "&quot;")}">${name}</option>`
+                )
+                .join("");
+          });
+      });
+    </script>
   </body>
 </html>
